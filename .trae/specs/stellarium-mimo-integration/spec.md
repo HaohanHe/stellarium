@@ -1,12 +1,13 @@
 # Stellarium 小米 MiMo 多模态 LLM 集成 - 产品需求文档
 
 ## Overview
-- **Summary**: 为 Stellarium 天文馆软件接入小米 MiMo 多模态大模型，实现智能天文问答、星空场景分析、图片理解等功能，增强用户的天文学习和探索体验。
-- **Purpose**: 将先进的多模态 AI 能力与 Stellarium 结合，为用户提供更智能、更丰富的天文探索体验，包括：智能天文知识问答、星空截图分析、语音交互、TTS 朗读等功能。
+- **Summary**: 为 Stellarium 天文馆软件接入小米 MiMo 多模态大模型，实现智能天文问答、星空场景分析、图片理解、模糊找星、LLM 工具调用等功能，将 Stellarium 转变为一个强大的 MCP (Model Context Protocol) 工具。
+- **Purpose**: 将先进的多模态 AI 能力与 Stellarium 深度结合，为用户提供更智能、更丰富的天文探索体验，包括：智能天文知识问答、星空截图分析、自然语言找星、LLM 直接控制 Stellarium、语音交互等功能。
 - **Target Users**: 
   - 天文爱好者：想要更深入了解天文现象和知识的用户
   - 学生和教育者：用于天文教育和学习
   - 普通用户：对星空和宇宙好奇的大众用户
+  - AI 研究和应用开发者：希望将 Stellarium 作为 MCP 工具集成到 AI 系统的用户
 
 ## Goals
 - [ ] 为 Stellarium 添加新的 AI 助手插件，支持与小米 MiMo 模型对话
@@ -16,13 +17,15 @@
 - [ ] 实现多轮对话功能，保持上下文理解
 - [ ] 提供配置界面，让用户设置 API Key 和偏好选项
 - [ ] 与 Stellarium 现有功能深度集成，如选中天体后自动获取相关信息
+- [ ] 实现模糊找星功能：通过自然语言描述（如"那颗红色的亮星"）让 LLM 帮助找到对应天体
+- [ ] 实现 MCP (Model Context Protocol) 工具调用能力：让 LLM 可以直接调用 Stellarium 的各项功能
+- [ ] 提供丰富的工具集供 LLM 使用：搜索天体、移动视角、设置时间、截图、获取数据等
 
 ## Non-Goals (Out of Scope)
-- 不实现完整的 Agent 系统或工具调用（第一阶段）
-- 不实现 Stellarium 功能的完全自动化（如自动寻找天体）
 - 不实现语音识别 (ASR) 功能（第一阶段）
 - 不实现视频理解功能（第一阶段）
 - 不修改 Stellarium 的核心渲染引擎
+- 不过度自动化用户的天文探索（保留用户的探索乐趣）
 
 ## Background & Context
 - Stellarium 是一个开源的天文馆软件，拥有丰富的天体数据和星空渲染能力
@@ -42,6 +45,24 @@
 - **FR-7**: 对话历史记录功能，支持保存和恢复对话
 - **FR-8**: 提供快捷问题按钮（预设的常见天文问题）
 - **FR-9**: 与 Stellarium UI 深度集成，如在选中天体时显示"询问 AI"按钮
+- **FR-10**: 实现模糊找星功能：
+  - 用户用自然语言描述天体特征（颜色、亮度、位置、类型等）
+  - LLM 理解并转换为搜索条件
+  - 在 Stellarium 中找到匹配的天体并定位
+- **FR-11**: 实现 OpenAI 兼容的 Function Calling / Tool Use 支持
+- **FR-12**: 提供 MCP (Model Context Protocol) 工具集，包括：
+  - 搜索天体：按名称、类型、坐标等搜索
+  - 获取天体详情：获取完整的天体信息
+  - 定位天体：将视野移动到指定天体
+  - 设置时间：跳转到特定日期时间
+  - 时间控制：开始/暂停/加速时间流动
+  - 截图：捕获当前画面
+  - 获取视野信息：获取当前可见的天体列表
+  - 切换功能：开启/关闭各种 Stellarium 功能（大气层、星座线、标签等）
+  - 位置设置：设置观测地点
+  - 缩放控制：放大缩小视野
+- **FR-13**: 支持 LLM 自主调用工具完成复杂任务，如"找今晚最亮的行星并放大"
+- **FR-14**: 提供工具调用的可视化反馈，让用户看到 LLM 正在做什么
 
 ## Non-Functional Requirements
 - **NFR-1**: 响应速度：对话请求在网络正常情况下应在 3 秒内返回
@@ -123,6 +144,48 @@
 - **When**: 用户点击快捷问题按钮
 - **Then**: 自动发送预设问题给 LLM
 - **Verification**: `programmatic`
+
+### AC-10: 模糊找星功能
+- **Given**: 插件已配置并启用
+- **When**: 用户用自然语言描述要找的天体（如"找那颗红色的亮星"）
+- **Then**: LLM 理解描述，调用工具搜索，并定位到匹配的天体
+- **Verification**: `human-judgment`
+
+### AC-11: 工具调用能力
+- **Given**: LLM 支持 Function Calling
+- **When**: LLM 决定需要调用工具来完成任务
+- **Then**: 正确调用对应的 Stellarium 工具并返回结果
+- **Verification**: `programmatic`
+
+### AC-12: 搜索天体工具
+- **Given**: 用户请求搜索某天体
+- **When**: LLM 调用搜索工具
+- **Then**: 正确搜索并返回匹配的天体列表
+- **Verification**: `programmatic`
+
+### AC-13: 定位天体工具
+- **Given**: 已找到目标天体
+- **When**: LLM 调用定位工具
+- **Then**: 视野自动移动到该天体并居中显示
+- **Verification**: `programmatic`
+
+### AC-14: 时间控制工具
+- **Given**: 用户想要调整时间
+- **When**: LLM 调用时间设置或控制工具
+- **Then**: Stellarium 的时间按要求调整
+- **Verification**: `programmatic`
+
+### AC-15: 工具调用可视化
+- **Given**: LLM 正在调用工具
+- **When**: 用户查看界面
+- **Then**: 能清晰看到正在调用什么工具和执行状态
+- **Verification**: `human-judgment`
+
+### AC-16: 复杂任务完成
+- **Given**: 用户请求复杂任务（如"找今晚最亮的行星，跳转到两小时后，放大它"）
+- **When**: LLM 处理请求
+- **Then**: LLM 能自主调用多个工具链来完成任务
+- **Verification**: `human-judgment`
 
 ## Open Questions
 - [ ] 第一阶段是否需要实现语音识别 (ASR)？

@@ -214,9 +214,138 @@
   - `programmatic` TR-14.2: 翻译资源正确配置
 - **Notes**: 参考其他插件的翻译文件
 
-## [ ] Task 15: 集成测试和修复问题
+## [ ] Task 15: 研究 Stellarium 核心 API
+- **Priority**: P0
+- **Depends On**: Task 1
+- **Description**: 
+  - 研究 Stellarium 如何控制视角移动
+  - 研究如何搜索和查找天体
+  - 研究如何设置和控制时间
+  - 研究如何调用各种功能（显示/隐藏大气层、星座线等）
+  - 研究如何获取当前视野信息
+- **Acceptance Criteria Addressed**: FR-10, FR-12
+- **Test Requirements**:
+  - `programmatic` TR-15.1: 列出可用的 API 和方法
+  - `human-judgement` TR-15.2: 编写 API 使用指南文档
+- **Notes**: 重点研究 [StelCore](file:///workspace/src/core/StelCore.hpp)、[StelMovementMgr](file:///workspace/src/core/StelMovementMgr.hpp)、[StelObjectMgr](file:///workspace/src/core/StelObjectMgr.hpp) 等
+
+## [ ] Task 16: 设计并实现工具系统框架
+- **Priority**: P0
+- **Depends On**: Task 3, Task 15
+- **Description**: 
+  - 设计工具基类和接口
+  - 实现工具注册和管理系统
+  - 实现 OpenAI 兼容的 Function Calling 协议支持
+  - 实现工具调用的执行和结果返回
+- **Acceptance Criteria Addressed**: FR-11
+- **Test Requirements**:
+  - `programmatic` TR-16.1: 工具能正确注册和发现
+  - `programmatic` TR-16.2: 能正确生成工具定义 JSON Schema
+  - `programmatic` TR-16.3: 能正确处理工具调用和返回结果
+- **Notes**: 参考 OpenAI Function Calling 规范
+
+## [ ] Task 17: 实现核心 MCP 工具 - 搜索和定位
+- **Priority**: P0
+- **Depends On**: Task 16
+- **Description**: 
+  - 实现 search_object 工具：搜索天体
+  - 实现 get_object_info 工具：获取天体详情
+  - 实现 locate_object 工具：定位到指定天体
+  - 实现 get_current_view 工具：获取当前视野信息
+- **Acceptance Criteria Addressed**: FR-12, AC-11, AC-12, AC-13
+- **Test Requirements**:
+  - `programmatic` TR-17.1: 搜索工具能找到正确的天体
+  - `programmatic` TR-17.2: 定位工具能正确移动视角
+  - `programmatic` TR-17.3: 获取信息工具返回完整数据
+- **Notes**: 需要很好地处理各种天体类型
+
+## [ ] Task 18: 实现 MCP 工具 - 时间和视图控制
 - **Priority**: P1
-- **Depends On**: Tasks 1-14
+- **Depends On**: Task 16
+- **Description**: 
+  - 实现 set_time 工具：设置日期时间
+  - 实现 control_time 工具：控制时间流动（开始/暂停/速度）
+  - 实现 set_location 工具：设置观测位置
+  - 实现 set_zoom 工具：控制缩放
+- **Acceptance Criteria Addressed**: FR-12, AC-14
+- **Test Requirements**:
+  - `programmatic` TR-18.1: 时间设置正确
+  - `programmatic` TR-18.2: 时间控制功能正常
+  - `programmatic` TR-18.3: 位置和缩放设置生效
+- **Notes**: 时间格式处理要特别注意
+
+## [ ] Task 19: 实现 MCP 工具 - 功能切换和截图
+- **Priority**: P1
+- **Depends On**: Task 16
+- **Description**: 
+  - 实现 toggle_feature 工具：切换各种功能（大气层、星座线、标签等）
+  - 实现 take_screenshot 工具：截图并返回
+  - 实现 list_features 工具：列出可用功能
+- **Acceptance Criteria Addressed**: FR-12
+- **Test Requirements**:
+  - `programmatic` TR-19.1: 功能切换正常
+  - `programmatic` TR-19.2: 截图功能正常
+- **Notes**: 功能列表需要覆盖主要的 Stellarium 功能
+
+## [ ] Task 20: 实现工具调用的可视化反馈
+- **Priority**: P1
+- **Depends On**: Task 5, Task 16
+- **Description**: 
+  - 在对话界面显示工具调用状态
+  - 显示正在调用什么工具
+  - 显示工具执行结果
+  - 提供工具调用的进度指示
+- **Acceptance Criteria Addressed**: FR-14, AC-15
+- **Test Requirements**:
+  - `human-judgement` TR-20.1: 工具调用状态清晰可见
+  - `human-judgement` TR-20.2: 反馈及时且友好
+- **Notes**: 可以参考 ChatGPT 的插件执行反馈设计
+
+## [ ] Task 21: 实现模糊找星功能
+- **Priority**: P1
+- **Depends On**: Task 16, Task 17
+- **Description**: 
+  - 设计并实现智能的天体搜索系统
+  - 让 LLM 理解自然语言描述并转换为搜索条件
+  - 整合多个工具实现搜索和定位的工作流
+  - 提供匹配度较高的候选结果
+- **Acceptance Criteria Addressed**: FR-10, AC-10
+- **Test Requirements**:
+  - `human-judgement` TR-21.1: 能理解颜色、亮度等描述
+  - `human-judgement` TR-21.2: 能正确找到匹配的天体
+  - `programmatic` TR-21.3: 定位功能正常工作
+- **Notes**: 这需要很好的提示词设计
+
+## [ ] Task 22: 实现多步任务协调
+- **Priority**: P1
+- **Depends On**: Task 16, Tasks 17-19
+- **Description**: 
+  - 实现工具链支持：让 LLM 能顺序调用多个工具
+  - 处理工具之间的依赖关系
+  - 支持复杂任务的完成（如"找行星→设置时间→放大"）
+- **Acceptance Criteria Addressed**: FR-13, AC-16
+- **Test Requirements**:
+  - `human-judgement` TR-22.1: 能完成多步骤任务
+  - `programmatic` TR-22.2: 工具调用顺序正确
+- **Notes**: 这部分主要靠 LLM 的推理能力，我们提供好工具即可
+
+## [ ] Task 23: 设计和优化系统提示词
+- **Priority**: P1
+- **Depends On**: Task 16
+- **Description**: 
+  - 编写专业的天文助手系统提示词
+  - 优化工具使用的指令
+  - 提供最佳实践的示例
+  - 支持用户自定义提示词
+- **Acceptance Criteria Addressed**: FR-2, FR-10, FR-13
+- **Test Requirements**:
+  - `human-judgement` TR-23.1: LLM 能正确理解角色
+  - `human-judgement` TR-23.2: 能正确选择和使用工具
+- **Notes**: 提示词设计对效果影响很大
+
+## [ ] Task 24: 集成测试和修复问题
+- **Priority**: P1
+- **Depends On**: Tasks 1-23
 - **Description**: 
   - 对所有功能进行完整测试
   - 修复发现的 bug
@@ -224,7 +353,7 @@
   - 进行跨平台测试（Windows、Linux、macOS）
 - **Acceptance Criteria Addressed**: 所有 AC
 - **Test Requirements**:
-  - `programmatic` TR-15.1: 所有功能测试通过
-  - `human-judgement` TR-15.2: 用户体验流畅
-  - `programmatic` TR-15.3: 在各平台正常工作
+  - `programmatic` TR-24.1: 所有功能测试通过
+  - `human-judgement` TR-24.2: 用户体验流畅
+  - `programmatic` TR-24.3: 在各平台正常工作
 - **Notes**: 这是最终的集成测试阶段
