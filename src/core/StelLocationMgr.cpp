@@ -400,7 +400,10 @@ void NMEALookupHelper::nmeaTimeout()
 #endif
 
 StelLocationMgr::StelLocationMgr()
-	: nmeaHelper(nullptr), libGpsHelper(nullptr), positionSource(nullptr), qGeoPositionInfoSource(nullptr)
+	: nmeaHelper(nullptr), libGpsHelper(nullptr)
+#ifdef ENABLE_LIBGPS
+	, positionSource(nullptr), qGeoPositionInfoSource(nullptr)
+#endif
 {
 	// initialize the static QMap first if necessary.
 	// The first entry is the DB name, the second is as we display it in the program.
@@ -496,6 +499,7 @@ StelLocationMgr::StelLocationMgr()
 	planetSurfaceMap=QImage(":/graphicGui/miscWorldMap.jpg");
 	connect(StelApp::getInstance().getCore(), SIGNAL(locationChanged(StelLocation)), this, SLOT(changePlanetMapForLocation(StelLocation)));
 
+#ifdef ENABLE_LIBGPS
 	// configure the QGeoPositionInfoSource which can be queried from OS
 	qGeoPositionInfoSource = QGeoPositionInfoSource::createDefaultSource(this);
 	if (qGeoPositionInfoSource && (qGeoPositionInfoSource->supportedPositioningMethods() & QGeoPositionInfoSource::AllPositioningMethods))
@@ -507,6 +511,7 @@ StelLocationMgr::StelLocationMgr()
 		delete qGeoPositionInfoSource;
 		qGeoPositionInfoSource=nullptr;
 	}
+#endif // ENABLE_LIBGPS
 }
 
 StelLocationMgr::~StelLocationMgr()
@@ -521,6 +526,7 @@ StelLocationMgr::~StelLocationMgr()
 		delete libGpsHelper;
 		libGpsHelper=nullptr;
 	}
+#ifdef ENABLE_LIBGPS
 	if (qGeoPositionInfoSource)
 	{
 		delete qGeoPositionInfoSource;
@@ -531,10 +537,14 @@ StelLocationMgr::~StelLocationMgr()
 		delete positionSource;
 		positionSource=nullptr;
 	}
+#endif
 }
 
 StelLocationMgr::StelLocationMgr(const LocationList &locations)
-	: nmeaHelper(nullptr), libGpsHelper(nullptr), positionSource(nullptr), qGeoPositionInfoSource(nullptr)
+	: nmeaHelper(nullptr), libGpsHelper(nullptr)
+#ifdef ENABLE_LIBGPS
+	, positionSource(nullptr), qGeoPositionInfoSource(nullptr)
+#endif
 {
 	setLocations(locations);
 
@@ -1000,6 +1010,7 @@ void StelLocationMgr::locationFromIP()
 }
 
 // Private slot that is called when position info arrives
+#ifdef ENABLE_LIBGPS
 void StelLocationMgr::positionUpdatedFromOS(const QGeoPositionInfo &info)
 {
         static StelCore *core=StelApp::getInstance().getCore();
@@ -1037,6 +1048,7 @@ void StelLocationMgr::positionUpdatedFromOS(const QGeoPositionInfo &info)
 	QSettings* conf = StelApp::getInstance().getSettings();
 	conf->setValue("init_location/last_location", QString("%1, %2").arg(QString::number(gCoord.latitude()), QString::number(gCoord.longitude())));
 }
+#endif // ENABLE_LIBGPS
 
 #ifdef ENABLE_GPS
 void StelLocationMgr::locationFromGPS(int interval)

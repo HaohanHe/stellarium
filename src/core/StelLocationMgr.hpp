@@ -25,7 +25,9 @@
 #include <QMetaType>
 #include <QMap>
 #include <QImage>
+#ifdef ENABLE_LIBGPS
 #include <QtPositioning/QGeoPositionInfoSource>
+#endif
 #include <QLoggingCategory>
 #include "VecMath.hpp"
 
@@ -196,10 +198,12 @@ private slots:
 	void positionUpdated(QGeoPositionInfo gpsPos);
 	//#endif
 #endif
+#ifdef ENABLE_LIBGPS
 	/// MAYBE NOT NEEDED AFTER ALL:
 	//! Use QLocation services to get location from OS (via IP, Wifi, ...)
 	//! Needs permissions.
 	void positionUpdatedFromOS(const QGeoPositionInfo &info);
+#endif
 
 private:
 	void loadRegions();
@@ -236,9 +240,11 @@ private:
 	QString planetName;
 
 	GPSLookupHelper *nmeaHelper,*libGpsHelper;
+#ifdef ENABLE_LIBGPS
 	QGeoPositionInfoSource *positionSource; // Used in the "Location from GPS or OS" query button action that may update.
 	// Used in the Location from Network query. Not sure if we really need two.
 	QGeoPositionInfoSource *qGeoPositionInfoSource;
+#endif
 };
 
 #endif // STELLOCATIONMGR_HPP

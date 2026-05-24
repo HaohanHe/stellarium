@@ -86,7 +86,7 @@ QString MiMoAPIClient::buildChatCompletionUrl() const
 
 QNetworkRequest MiMoAPIClient::buildRequest(const QString& url) const
 {
-	QNetworkRequest request(QUrl(url));
+	QNetworkRequest request{QUrl(url)};
 	request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 	if (!m_apiKey.isEmpty()) {
 		request.setRawHeader("Authorization", QString("Bearer %1").arg(m_apiKey).toUtf8());

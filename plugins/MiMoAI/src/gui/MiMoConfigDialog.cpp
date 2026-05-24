@@ -22,6 +22,7 @@
 
 #include <QSettings>
 #include "StelApp.hpp"
+#include "StelModuleMgr.hpp"
 #include "StelGui.hpp"
 #include "StelTranslator.hpp"
 

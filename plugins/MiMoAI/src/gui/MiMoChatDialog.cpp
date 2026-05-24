@@ -28,6 +28,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include "StelApp.hpp"
+#include "StelModuleMgr.hpp"
 #include "StelGui.hpp"
 #include "StelTranslator.hpp"
 
@@ -222,7 +223,7 @@ void MiMoChatDialog::saveChatHistory()
 {
     QString fileName = QFileDialog::getSaveFileName(nullptr,
         tr("Save Chat History"), "",
-        tr("JSON Files (*.json);;All Files (*)");
+        tr("JSON Files (*.json);;All Files (*)"));
     
     if (!fileName.isEmpty())
     {
@@ -234,7 +235,7 @@ void MiMoChatDialog::loadChatHistory()
 {
     QString fileName = QFileDialog::getOpenFileName(nullptr,
         tr("Load Chat History"), "",
-        tr("JSON Files (*.json);;All Files (*)");
+        tr("JSON Files (*.json);;All Files (*)"));
     
     if (!fileName.isEmpty())
     {

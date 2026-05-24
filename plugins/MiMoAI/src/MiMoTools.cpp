@@ -18,6 +18,7 @@
 
 #include "MiMoTools.hpp"
 #include "StelApp.hpp"
+#include "StelModuleMgr.hpp"
 #include "StelTranslator.hpp"
 #include <QDateTime>
 
@@ -227,12 +228,12 @@ QVariantMap GetCurrentViewTool::execute(const QVariantMap& arguments)
 
     StelLocation location = core->getCurrentLocation();
     double jd = core->getJD();
-    QDateTime dateTime = StelUtils::getDateTimeFromJulianDay(jd);
+    QDateTime dateTime = StelUtils::jdToQDateTime(jd, Qt::UTC);
 
     QVariantMap data;
     data["location"] = location.name;
-    data["latitude"] = location.latitude;
-    data["longitude"] = location.longitude;
+    data["latitude"] = location.getLatitude();
+    data["longitude"] = location.getLongitude();
     data["altitude"] = location.altitude;
     data["datetime"] = dateTime.toString(Qt::ISODate);
     data["julian_day"] = jd;
@@ -291,7 +292,7 @@ QVariantMap SetTimeTool::execute(const QVariantMap& arguments)
         QDateTime datetime = QDateTime::fromString(datetimeStr, Qt::ISODate);
         if (datetime.isValid())
         {
-            double jd = StelUtils::getJulianDayFromDateTime(datetime);
+            double jd = StelUtils::qDateTimeToJd(datetime);
             core->setJD(jd);
             return successResult(QString("Time set to: %1").arg(datetime.toString()));
         }
@@ -437,8 +438,8 @@ QVariantMap SetLocationTool::execute(const QVariantMap& arguments)
         double altitude = arguments.value("altitude", 0.0).toDouble();
 
         StelLocation location;
-        location.latitude = latitude;
-        location.longitude = longitude;
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
         location.altitude = altitude;
         location.name = QString("Custom (%1, %2)").arg(latitude).arg(longitude);
 

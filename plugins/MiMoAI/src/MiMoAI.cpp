@@ -28,6 +28,8 @@
 #include "MiMoTools.hpp"
 
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QSettings>
 #include <QPixmap>
 

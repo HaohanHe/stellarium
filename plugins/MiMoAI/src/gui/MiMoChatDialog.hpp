@@ -39,7 +39,7 @@ public slots:
 protected:
 	void createDialogContent() override;
 
-private slots:
+public slots:
 	void sendMessage();
 	void onChatCompletionReceived(const MiMoAPIClient::ChatCompletionResponse& response);
 	void onErrorOccurred(const QString& error);
